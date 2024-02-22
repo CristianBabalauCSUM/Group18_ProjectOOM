@@ -15,12 +15,14 @@ public class NotificationsUI extends JFrame {
     private static final int NAV_ICON_SIZE = 20; // Size for navigation icons
     
     public NotificationsUI() {
+
         setTitle("Notifications");
         setSize(WIDTH, HEIGHT);
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         initializeUI();
+        
     }
 
     private void initializeUI() {

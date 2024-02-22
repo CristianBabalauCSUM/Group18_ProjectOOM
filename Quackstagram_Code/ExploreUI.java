@@ -132,7 +132,7 @@ public class ExploreUI extends JFrame {
         return navigationPanel;
    }
 
-   private void displayImage(String imagePath) {
+   private void displayImage(String imagePath) {//here
     getContentPane().removeAll();
     setLayout(new BorderLayout());
 
@@ -231,7 +231,7 @@ topPanel.add(timeLabel, BorderLayout.EAST);
  });
  final String finalUsername = username;
 
- usernameLabel.addActionListener(e -> {
+ usernameLabel.addActionListener(e -> { // here
     User user = new User(finalUsername); // Assuming User class has a constructor that takes a username
     InstagramProfileUI profileUI = new InstagramProfileUI(user);
     profileUI.setVisible(true);
@@ -264,7 +264,7 @@ private JButton createIconButton(String iconPath, String buttonType) {
     button.setContentAreaFilled(false);
 
     // Define actions based on button type
-    if ("home".equals(buttonType)) {
+    if ("home".equals(buttonType)) { // here swich case
         button.addActionListener(e -> openHomeUI());
     } else if ("profile".equals(buttonType)) {
         button.addActionListener(e -> openProfileUI());
@@ -286,24 +286,24 @@ private void ImageUploadUI() {
     ImageUploadUI upload = new ImageUploadUI();
     upload.setVisible(true);
 }
-   private void openProfileUI() {
-       // Open InstagramProfileUI frame
-       this.dispose();
-       String loggedInUsername = "";
+private void openProfileUI() {
+    // Open InstagramProfileUI frame
+    this.dispose();
+    String loggedInUsername = "";
 
-        // Read the logged-in user's username from users.txt
-    try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "users.txt"))) {
-        String line = reader.readLine();
-        if (line != null) {
-            loggedInUsername = line.split(":")[0].trim();
-        }
-    } catch (IOException e) {
-        e.printStackTrace();
+    // Read the logged-in user's username from users.txt
+try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "users.txt"))) {
+    String line = reader.readLine();
+    if (line != null) {
+        loggedInUsername = line.split(":")[0].trim();
     }
-     User user = new User(loggedInUsername);
-       InstagramProfileUI profileUI = new InstagramProfileUI(user);
-       profileUI.setVisible(true);
-   }
+} catch (IOException e) {
+    e.printStackTrace();
+}
+    User user = new User(loggedInUsername);
+    InstagramProfileUI profileUI = new InstagramProfileUI(user);
+    profileUI.setVisible(true);
+}
 
     private void notificationsUI() {
        // Open InstagramProfileUI frame
