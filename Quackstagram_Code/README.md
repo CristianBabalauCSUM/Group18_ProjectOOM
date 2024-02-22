@@ -108,3 +108,17 @@ The second phase is about implementing all the proposed changes from phase 1 and
 -   Don\'t forget to have fun! While you have a lot of deliverables for this project which can make it look like a daunting task, don\'t forget it was designed so you can learn about the theoretical concepts of good and efficient programming - in a fun way. So have fun with it and don\'t shy away from showing off your creativity to us! We will love it and are here for it 🥳
 
 [^1]: There is no minimum number of refactoring that you need to do, we have un-intentionally put in many chunks of code that need refactoring (hey, this a direct consequence of operating with a budget that could rival the thickness of a single-ply tissue paper—a hallmark of the economical ingenuity for which Cheapo Software Solutions is renowned).
+
+
+
+
+
+Must do///////
+    Make a post class:
+        Contains info about posts:
+            Everything related to (Likes
+            Coments)
+            
+User file: two constructors
+
+Upload picture: crash!

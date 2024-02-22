@@ -98,10 +98,6 @@ public class SignUpUI extends JFrame {
         registerPanel.setBackground(Color.WHITE); // Background for the panel
         registerPanel.add(btnRegister, BorderLayout.CENTER);
 
-      
-
-       
-
         // Adding components to the frame
         add(headerPanel, BorderLayout.NORTH);
         add(fieldsPanel, BorderLayout.CENTER);

@@ -7,6 +7,7 @@ public class ImageLikesManager {
     private final String likesFilePath = "data/likes.txt";
 
     // Method to like an image
+    //here change the logic behind add likes
     public void likeImage(String username, String imageID) throws IOException {
         Map<String, Set<String>> likesMap = readLikes();
         if (!likesMap.containsKey(imageID)) {
@@ -34,7 +35,7 @@ public class ImageLikesManager {
     }
 
     // Method to save likes to file
-    private void saveLikes(Map<String, Set<String>> likesMap) throws IOException {
+    private void saveLikes(Map<String, Set<String>> likesMap) throws IOException { 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(likesFilePath, false))) {
             for (Map.Entry<String, Set<String>> entry : likesMap.entrySet()) {
                 String line = entry.getKey() + ":" + String.join(",", entry.getValue());
