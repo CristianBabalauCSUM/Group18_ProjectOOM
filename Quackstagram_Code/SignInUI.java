@@ -59,7 +59,6 @@ public class SignInUI extends JFrame {
         txtUsername.setForeground(Color.GRAY);
         txtPassword.setForeground(Color.GRAY);
 
-
         fieldsPanel.add(Box.createVerticalStrut(10));
         fieldsPanel.add(photoPanel);
         fieldsPanel.add(Box.createVerticalStrut(10));
@@ -135,8 +134,8 @@ private void onRegisterNowClicked(ActionEvent event) {
     });
 }
 
-private boolean verifyCredentials(String username, String password) {//here
-    try (BufferedReader reader = new BufferedReader(new FileReader("Quackstagram_Code\\data\\credentials.txt"))) {
+private boolean verifyCredentials(String username, String password) {
+    try (BufferedReader reader = new BufferedReader(new FileReader("data/credentials.txt"))) {
         String line;
         while ((line = reader.readLine()) != null) {
             String[] credentials = line.split(":");
