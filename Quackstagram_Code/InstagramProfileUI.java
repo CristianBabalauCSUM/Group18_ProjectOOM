@@ -1,5 +1,6 @@
 import javax.swing.*;
 
+import UI_Components.HeaderPanel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -30,88 +31,17 @@ public class InstagramProfileUI extends JFrame {
 
     public InstagramProfileUI(User user) {
         this.currentUser = user;
-         // Initialize counts
-        int imageCount = 0;
-        int followersCount = 0;
-        int followingCount = 0;
-       
-        // Step 1: Read image_details.txt to count the number of images posted by the user
-    Path imageDetailsFilePath = Paths.get("img", "image_details.txt");
-    try (BufferedReader imageDetailsReader = Files.newBufferedReader(imageDetailsFilePath)) {
-        String line;
-        while ((line = imageDetailsReader.readLine()) != null) {
-            if (line.contains("Username: " + currentUser.getUsername())) {
-                imageCount++;
-            }
-        }
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-
-    // Step 2: Read following.txt to calculate followers and following
-    Path followingFilePath = Paths.get("data", "following.txt");
-    try (BufferedReader followingReader = Files.newBufferedReader(followingFilePath)) {
-        String line;
-        while ((line = followingReader.readLine()) != null) {
-            String[] parts = line.split(":");
-            if (parts.length == 2) {
-                String username = parts[0].trim();
-                String[] followingUsers = parts[1].split(";");
-                if (username.equals(currentUser.getUsername())) {
-                    followingCount = followingUsers.length;
-                } else {
-                    for (String followingUser : followingUsers) {
-                        if (followingUser.trim().equals(currentUser.getUsername())) {
-                            followersCount++;
-                        }
-                    }
-                }
-            }
-        }
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-
-    String bio = "";
-
-    Path bioDetailsFilePath = Paths.get("data", "credentials.txt");
-    try (BufferedReader bioDetailsReader = Files.newBufferedReader(bioDetailsFilePath)) {
-        String line;
-        while ((line = bioDetailsReader.readLine()) != null) {
-            String[] parts = line.split(":");
-            if (parts[0].equals(currentUser.getUsername()) && parts.length >= 3) {
-                bio = parts[2];
-                break; // Exit the loop once the matching bio is found
-            }
-        }
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-    
-    System.out.println("Bio for " + currentUser.getUsername() + ": " + bio);
-    currentUser.setBio(bio);
-    
-
-    currentUser.setFollowersCount(followersCount);
-    currentUser.setFollowingCount(followingCount);
-    currentUser.setPostCount(imageCount);
-
-    System.out.println(currentUser.getPostsCount());
-
-     setTitle("DACS Profile");
+        setTitle("DACS Profile");
         setSize(WIDTH, HEIGHT);
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         contentPanel = new JPanel();
-        headerPanel = createHeaderPanel();       // Initialize header panel
-        navigationPanel = createNavigationPanel(); // Initialize navigation panel
-
+        headerPanel = new HeaderPanelProfileUI(currentUser);       // Initialize header panel
+        navigationPanel = new NavigationPanel(this); // Initialize navigation panel
         initializeUI();
     }
-
-
-      public InstagramProfileUI() {
+    public InstagramProfileUI() {
 
         setTitle("DACS Profile");
         setSize(WIDTH, HEIGHT);
@@ -119,9 +49,10 @@ public class InstagramProfileUI extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         contentPanel = new JPanel();
-        headerPanel = createHeaderPanel();       // Initialize header panel
-        navigationPanel = createNavigationPanel(); // Initialize navigation panel
+        headerPanel = new HeaderPanelProfileUI(currentUser);    // Initialize header panel
+        navigationPanel = new NavigationPanel(this); // Initialize navigation panel
         initializeUI();
+
     }
 
     private void initializeUI() {
@@ -137,6 +68,57 @@ public class InstagramProfileUI extends JFrame {
         revalidate();
         repaint();
     }
+
+
+private void initializeImageGrid() {
+    contentPanel.removeAll(); // Clear existing content
+    contentPanel.setLayout(new GridLayout(0, 3, 5, 5)); // Grid layout for image grid
+
+    Path imageDir = Paths.get("img", "uploaded");
+
+    try (Stream<Path> paths = Files.list(imageDir)) {
+        paths.filter(path -> path.getFileName().toString().startsWith(currentUser.getUsername() + "_"))
+             .forEach(path -> {
+
+                 ImageIcon imageIcon = new ImageIcon(new ImageIcon(path.toString()).getImage().getScaledInstance(GRID_IMAGE_SIZE, GRID_IMAGE_SIZE, Image.SCALE_SMOOTH));
+                 JLabel imageLabel = new JLabel(imageIcon);
+                 
+                 MouseAdapter adapter = new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent event) {
+                        displayImage(imageIcon, path.toString());
+                    }
+                };
+
+                imageLabel.addMouseListener(adapter);
+                contentPanel.add(imageLabel);
+             });
+    } catch (IOException ex) {
+        ex.printStackTrace();
+        // Handle exception (e.g., show a message or log)
+    }
+
+    JScrollPane scrollPane = new JScrollPane(contentPanel);
+    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+    add(scrollPane, BorderLayout.CENTER); // Add the scroll pane to the center
+
+    revalidate();
+    repaint();
+}
+
+
+
+    private void displayImage(ImageIcon imageIcon, String imagePath) {
+        this.dispose();
+        JFrame imageDisplay = new ImageDisplayUI(imageIcon, imagePath, currentUser);
+        imageDisplay.setVisible(true);
+    }
+
+
+    /* 
+
 
     private JPanel createHeaderPanel() {
         boolean isCurrentUser = false;
@@ -264,10 +246,11 @@ headerPanel.add(profileNameAndBioPanel);
         
         return headerPanel;
 
-    }
+    }    
 
 
-   private void handleFollowAction(String usernameToFollow) {
+
+       private void handleFollowAction(String usernameToFollow) {
     Path followingFilePath = Paths.get("data", "following.txt");
     Path usersFilePath = Paths.get("data", "users.txt");
     String currentUserUsername = "";
@@ -320,66 +303,14 @@ headerPanel.add(profileNameAndBioPanel);
     }
 }
 
-    
 
-    
-    
-    private JPanel createNavigationPanel() {
-        // Navigation Bar
-        JPanel navigationPanel = new JPanel();
-        navigationPanel.setBackground(new Color(249, 249, 249));
-        navigationPanel.setLayout(new BoxLayout(navigationPanel, BoxLayout.X_AXIS));
-        navigationPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        navigationPanel.add(createIconButton("img/icons/home.png", "home"));
-        navigationPanel.add(Box.createHorizontalGlue());
-        navigationPanel.add(createIconButton("img/icons/search.png","explore"));
-        navigationPanel.add(Box.createHorizontalGlue());
-        navigationPanel.add(createIconButton("img/icons/add.png","add"));
-        navigationPanel.add(Box.createHorizontalGlue());
-        navigationPanel.add(createIconButton("img/icons/heart.png","notification"));
-        navigationPanel.add(Box.createHorizontalGlue());
-        navigationPanel.add(createIconButton("img/icons/profile.png", "profile"));
-
-        return navigationPanel;
-
+    private JLabel createStatLabel(String number, String text) {
+        JLabel label = new JLabel("<html><div style='text-align: center;'>" + number + "<br/>" + text + "</div></html>", SwingConstants.CENTER);
+        label.setFont(new Font("Arial", Font.BOLD, 12));
+        label.setForeground(Color.BLACK);
+        return label;
     }
-
-private void initializeImageGrid() {
-    contentPanel.removeAll(); // Clear existing content
-    contentPanel.setLayout(new GridLayout(0, 3, 5, 5)); // Grid layout for image grid
-
-    Path imageDir = Paths.get("img", "uploaded");
-    try (Stream<Path> paths = Files.list(imageDir)) {
-        paths.filter(path -> path.getFileName().toString().startsWith(currentUser.getUsername() + "_"))
-             .forEach(path -> {
-                 ImageIcon imageIcon = new ImageIcon(new ImageIcon(path.toString()).getImage().getScaledInstance(GRID_IMAGE_SIZE, GRID_IMAGE_SIZE, Image.SCALE_SMOOTH));
-                 JLabel imageLabel = new JLabel(imageIcon);
-                 imageLabel.addMouseListener(new MouseAdapter() {
-                     @Override
-                     public void mouseClicked(MouseEvent e) {
-                         displayImage(imageIcon); // Call method to display the clicked image
-                     }
-                 });
-                 contentPanel.add(imageLabel);
-             });
-    } catch (IOException ex) {
-        ex.printStackTrace();
-        // Handle exception (e.g., show a message or log)
-    }
-
-    JScrollPane scrollPane = new JScrollPane(contentPanel);
-    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-    add(scrollPane, BorderLayout.CENTER); // Add the scroll pane to the center
-
-    revalidate();
-    repaint();
-}
-
-
-
+    
     private void displayImage(ImageIcon imageIcon) {
         contentPanel.removeAll(); // Remove existing content
         contentPanel.setLayout(new BorderLayout()); // Change layout for image display
@@ -400,12 +331,25 @@ private void initializeImageGrid() {
     }
 
 
+    private JPanel createNavigationPanel() {
+        // Navigation Bar
+        JPanel navigationPanel = new JPanel();
+        navigationPanel.setBackground(new Color(249, 249, 249));
+        navigationPanel.setLayout(new BoxLayout(navigationPanel, BoxLayout.X_AXIS));
+        navigationPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-    private JLabel createStatLabel(String number, String text) {
-        JLabel label = new JLabel("<html><div style='text-align: center;'>" + number + "<br/>" + text + "</div></html>", SwingConstants.CENTER);
-        label.setFont(new Font("Arial", Font.BOLD, 12));
-        label.setForeground(Color.BLACK);
-        return label;
+        navigationPanel.add(createIconButton("img/icons/home.png", "home"));
+        navigationPanel.add(Box.createHorizontalGlue());
+        navigationPanel.add(createIconButton("img/icons/search.png","explore"));
+        navigationPanel.add(Box.createHorizontalGlue());
+        navigationPanel.add(createIconButton("img/icons/add.png","add"));
+        navigationPanel.add(Box.createHorizontalGlue());
+        navigationPanel.add(createIconButton("img/icons/heart.png","notification"));
+        navigationPanel.add(Box.createHorizontalGlue());
+        navigationPanel.add(createIconButton("img/icons/profile.png", "profile"));
+
+        return navigationPanel;
+
     }
 
     private JButton createIconButton(String iconPath, String buttonType) {
@@ -431,6 +375,7 @@ private void initializeImageGrid() {
     
         
     }
+
  
     private void ImageUploadUI() {
         // Open InstagramProfileUI frame
@@ -466,6 +411,6 @@ private void initializeImageGrid() {
         ExploreUI explore = new ExploreUI();
         explore.setVisible(true);
     }   
-
+    */
     
 }

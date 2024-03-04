@@ -1,4 +1,7 @@
 import javax.swing.*;
+
+import UI_Components.HeaderPanel;
+
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,8 +28,8 @@ public class NotificationsUI extends JFrame {
 
     private void initializeUI() {
         // Reuse the header and navigation panel creation methods from the InstagramProfileUI class
-        JPanel headerPanel = createHeaderPanel();
-        JPanel navigationPanel = createNavigationPanel();
+        JPanel headerPanel = new HeaderPanel("Notifications");
+        JPanel navigationPanel = new NavigationPanel(this);
 
         // Content Panel for notifications
         JPanel contentPanel = new JPanel();
@@ -37,6 +40,7 @@ public class NotificationsUI extends JFrame {
 
    // Read the current username from users.txt
    String currentUsername = "";
+
    try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "users.txt"))) {
        String line = reader.readLine();
        if (line != null) {
@@ -70,16 +74,16 @@ public class NotificationsUI extends JFrame {
             contentPanel.add(notificationPanel);
         }
     }
-} catch (IOException e) {
-    e.printStackTrace();
-}
-        // Add panels to frame
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
         add(headerPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         add(navigationPanel, BorderLayout.SOUTH);
     }
 
 private String getElapsedTime(String timestamp) {
+    
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     LocalDateTime timeOfNotification = LocalDateTime.parse(timestamp, formatter);
     LocalDateTime currentTime = LocalDateTime.now();
@@ -113,6 +117,7 @@ private String getElapsedTime(String timestamp) {
           headerPanel.setPreferredSize(new Dimension(WIDTH, 40)); // Give the header a fixed height
           return headerPanel;
     }
+    /*  
 
     private JPanel createNavigationPanel() {
         // Create and return the navigation panel
@@ -159,6 +164,7 @@ private String getElapsedTime(String timestamp) {
         
     }
  
+    
     private void ImageUploadUI() {
         // Open InstagramProfileUI frame
         this.dispose();
@@ -210,5 +216,5 @@ private String getElapsedTime(String timestamp) {
         ExploreUI explore = new ExploreUI();
         explore.setVisible(true);
     }
-
+*/
 }

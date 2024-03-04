@@ -20,13 +20,41 @@ public class SignInUI extends JFrame {
     private User newUser;
     
 
-    public SignInUI() {
+    public SignInUI(boolean testMethod) {
         setTitle("Quackstagram - Register");
         setSize(WIDTH, HEIGHT);
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
-        initializeUI();
+        if (testMethod){
+            initializeUI(true);
+        } else {
+            initializeUI();
+        }
+
+    }
+
+    private void initializeUI(boolean testMethod) {
+        String enteredUsername = "Mystar";
+        String enteredPassword = "Password";
+
+
+        System.out.println(enteredUsername+" <-> "+enteredPassword);
+
+
+        if (verifyCredentials(enteredUsername, enteredPassword)) {
+            System.out.println("It worked");
+            // Close the SignUpUI frame
+        dispose();
+
+        // Open the SignInUI frame
+        SwingUtilities.invokeLater(() -> {
+            InstagramProfileUI profileUI = new InstagramProfileUI(newUser);
+            profileUI.setVisible(true);
+        });
+        } else {
+            System.out.println("It Didn't");
+        }
     }
 
     private void initializeUI() {
@@ -163,9 +191,11 @@ private boolean verifyCredentials(String username, String password) {
     }
 
     public static void main(String[] args) {
+
         SwingUtilities.invokeLater(() -> {
-            SignInUI frame = new SignInUI();
+            SignInUI frame = new SignInUI(true);
             frame.setVisible(true);
         });
+        
     }
 }
